@@ -1,53 +1,51 @@
 import math
+import requests
+from PIL import Image
+import io
 
 class DrawThingsWrapper:
     def __init__(self):
         pass
 
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model_type": (["SD","SDXL"],),
-                "aspect_ratio_width": ("INT",{
-                    "default": 1,
-                    "step":1,
-                    "display": "number"
-                }),
-                "aspect_ratio_height": ("INT",{
-                    "default": 1,
-                    "step":1,
-                    "display": "number"
-                })
-            }
-        }
-
-    RETURN_TYPES = ("INT","INT")
-    RETURN_NAMES = ("Width", "Height")
-
-    FUNCTION = "run"
 
     CATEGORY = "DrawThingsWrapper"
 
-    def run(self, model_type, aspect_ratio_width, aspect_ratio_height):
-        # Define the total pixel counts for SD and SDXL
-        total_pixels = {
-            'SD': 512 * 512,
-            'SDXL': 1024 * 1024
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": ""}),
+                "seed": ("INT", {"default": 42}),
+                "width": ("INT", {"default": 512}),
+                "height": ("INT", {"default": 512}),
+            }
         }
-        
-        # Calculate the number of total pixels based on model type
-        pixels = total_pixels.get(model_type, 0)
-        
-        # Calculate the aspect ratio decimal
-        aspect_ratio_decimal = aspect_ratio_width / aspect_ratio_height
-        
-        # Calculate width and height
-        width = math.sqrt(pixels * aspect_ratio_decimal)
-        height = pixels / width
-        
-        # Return the width and height as a tuple of integers
-        return (int(round(width)), int(round(height)))
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "generate_image"
+
+    def generate_image(self, prompt, seed, width, height):
+        # Call the Draw Things API
+        api_url = "http://127.0.0.1:7860//sdapi/v1/txt2img"
+
+        payload = {
+            "prompt": prompt,
+            "seed": seed,
+            "width": width,
+            "height": height
+        }
+
+        response = requests.post(api_url, json=payload)
+
+        if response.status_code == 200:
+            image_data = response.content  # Assuming the API returns raw image data
+            image = Image.open(io.BytesIO(image_data))  # Convert raw data to an image object
+            return (image,)  # Return as a tuple (ComfyUI expects output in tuple form)
+        else:
+            raise Exception(f"Failed to generate image: {response.text}")
+
+# Register the node (depending on ComfyUI's mechanism, adjust accordingly)
+
     
 NODE_CLASS_MAPPINGS = {
     "DrawThingsWrapper": DrawThingsWrapper
