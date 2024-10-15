@@ -21,6 +21,7 @@ class DrawThingsWrapper:
                 "seed": ("INT", {"default": 42}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
+                "guidance_scale": ("FLOAT", {"default": 3.5}),
             }
         }
 
@@ -28,7 +29,7 @@ class DrawThingsWrapper:
     RETURN_NAMES = ("generated_image",)
     FUNCTION = "generate_image"
 
-    def generate_image(self, prompt, seed, width, height):
+    def generate_image(self, prompt, seed, width, height, guidance_scale):
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 
@@ -36,7 +37,8 @@ class DrawThingsWrapper:
             "prompt": prompt,
             "seed": seed,
             "width": width,
-            "height": height
+            "height": height,
+            "guidance_scale": guidance_scale
         }
 
         response = requests.post(api_url, json=payload)
