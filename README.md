@@ -6,6 +6,8 @@ These nodes provide a wrapper for calling [Draw Things](https://drawthings.ai/) 
 
 This simple node calls a local instance of Draw Things through its API and returns the resulting image to ComfyUI.
 
+![](basic_example.png)
+
 # Set up
 
 **Draw Things** Start Draw Things, and in the "Advanced" tab on the left-hand side, enable "API Server" with settings Protocol HTTP, Port 7860 and IP localhost only. ComfyUI jobs can now generate via Draw Things. The generations will also display in the Draw Things as if they had been triggered natively.
