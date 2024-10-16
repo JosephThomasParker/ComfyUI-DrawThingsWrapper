@@ -8,7 +8,16 @@ This simple node calls a local instance of Draw Things through its API and retur
 
 # Set up
 
-Start Draw Things, and in the "Advanced" tab on the left-hand side, enable "API Server" with settings Protocol HTTP, Port 7860 and IP localhost only. ComfyUI jobs can now generate via Draw Things. The generations will also display in the Draw Things as if they had been triggered natively.
+**Draw Things** Start Draw Things, and in the "Advanced" tab on the left-hand side, enable "API Server" with settings Protocol HTTP, Port 7860 and IP localhost only. ComfyUI jobs can now generate via Draw Things. The generations will also display in the Draw Things as if they had been triggered natively.
+
+**ComfyUI** Clone this repo into the ComfyUI `custom_nodes` directory and install requirements:
+
+```
+cd path/to/ComfyUI/custom_nodes/
+git clone git@github.com:JosephThomasParker/ComfyUI-DrawThingsWrapper.git
+cd ComfyUI-DrawThingsWrapper
+pip install -r requirements.txt
+```
 
 # Limitations
 
