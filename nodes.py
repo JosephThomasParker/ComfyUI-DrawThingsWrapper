@@ -1,15 +1,19 @@
+#!/usr/bin/env python3
+"""
+Wrapper nodes for calling Draw Things from ComfyUI
+"""
+
 import base64
 import numpy as np
-import math
 import requests
 from PIL import Image
 import io
-import torch 
+import torch
+
 
 class DrawThingsWrapper:
     def __init__(self):
         pass
-
 
     CATEGORY = "DrawThingsWrapper"
 
@@ -40,7 +44,7 @@ class DrawThingsWrapper:
             "width": width,
             "height": height,
             "guidance_scale": guidance_scale,
-            "steps": steps
+            "steps": steps,
         }
 
         response = requests.post(api_url, json=payload)
@@ -53,7 +57,7 @@ class DrawThingsWrapper:
 
         # Process the images (assuming they are base64 encoded or raw binary data)
         images = []
-        for img_data in data['images']:
+        for img_data in data["images"]:
             image_bytes = base64.b64decode(img_data)
             # Convert the image data to a Pillow Image object
             image = Image.open(io.BytesIO(image_bytes))
@@ -61,12 +65,9 @@ class DrawThingsWrapper:
             # Convert to float32 tensor and normalize
             tensor_image = torch.from_numpy(image_np.astype(np.float32) / 255.0)
             images.append(tensor_image)
-        return(torch.stack(images),)
-    
-NODE_CLASS_MAPPINGS = {
-    "DrawThingsWrapper": DrawThingsWrapper
-}
+        return (torch.stack(images),)
 
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "DrawThingsWrapper": "Draw Things Wrapper"
-}
+
+NODE_CLASS_MAPPINGS = {"DrawThingsWrapper": DrawThingsWrapper}
+
+NODE_DISPLAY_NAME_MAPPINGS = {"DrawThingsWrapper": "Draw Things Wrapper"}
