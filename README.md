@@ -12,7 +12,7 @@ Start Draw Things, and in the "Advanced" tab on the left-hand side, enable "API 
 
 # Limitations
 
-This node treats Draw Things as a black box, and can only change the settings available through the [Draw Things API](https://docs.drawthings.ai/documentation/documentation/8.scripts). Settings changed through the API automatically change the values in the Draw Things UI. Other settings can be set manually inside the UI. These manual settings _do_ take effect for jobs initiated by ComfyUI, but are _not_ recorded by ComfyUI, so such ComfyUI workflows are not reproducible (without also ensuring the Draw Things settings are the same).
+This node treats Draw Things as a black box, and can only change the settings available through the [Draw Things API](https://docs.drawthings.ai/documentation/documentation/8.scripts). Settings changed through the API automatically change the values in the Draw Things UI. Other settings can be set manually inside the UI. These manual settings _do_ take effect for jobs initiated by ComfyUI, but are _not_ recorded by ComfyUI, so such ComfyUI workflows are not reproducible (without also ensuring the Draw Things settings are the same). This also means that if changes are made _only_ in the Draw Things UI, ComfyUI will not recognise that the workflow is different, and will _not_ reexecute the run.
 
 # Disclaimer
 
