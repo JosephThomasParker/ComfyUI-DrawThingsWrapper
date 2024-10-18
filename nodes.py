@@ -27,7 +27,7 @@ class DrawThingsWrapper:
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "guidance_scale": ("FLOAT", {"default": 3.5}),
-                "sampler": ("STRING", {"default": "Euler A Trailing"}),
+                "sampler": (["UniPC","DPM++ 2M Karras","Euler Ancestral", "DPM++ SDE Karras", "PLMS", "DDIM", "LCM", "Euler A Substep", "DPM++ SDE Substep", "TCD", "DPM++ 2M Trailing", "Euler A Trailing", "DPM++ SDE Trailing", "DDIM Trailing", "DPM++ 2M AYS", "Euler A AYS", "DPM++ SDE AYS"], {"default": "Euler A Trailing"}),
                 "steps": ("INT", {"default": 20}),
             }
         }
