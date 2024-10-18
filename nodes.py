@@ -8,6 +8,7 @@ import numpy as np
 import requests
 from PIL import Image
 import io
+from io import BytesIO
 import torch
 
 
@@ -71,6 +72,20 @@ class DrawThingsTxt2Img:
             images.append(tensor_image)
         return (torch.stack(images),)
 
+
+def image_to_base64(image_tensor):
+    # Convert the image tensor to a NumPy array and scale it to the range 0-255
+    i = 255. * image_tensor.cpu().numpy()
+    img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+
+    # Save the image to a BytesIO object (in memory) rather than to a file
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+
+    # Encode the image as base64
+    encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    return encoded_string
+
 class DrawThingsImg2Img:
     def __init__(self):
         pass
@@ -81,6 +96,7 @@ class DrawThingsImg2Img:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "images": ("IMAGE", {"tooltip": "input image"}),
                 "model": ("STRING", {"default": "flux_1_dev_q8p.ckpt"}),
                 "prompt": ("STRING", {"default": ""}),
                 "seed": ("INT", {"default": 42}),
@@ -96,7 +112,7 @@ class DrawThingsImg2Img:
     RETURN_NAMES = ("generated_image",)
     FUNCTION = "generate_image"
 
-    def generate_image(self, model, prompt, seed, width, height, guidance_scale, sampler, steps):
+    def generate_image(self, images, model, prompt, seed, width, height, guidance_scale, sampler, steps):
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/img2img"
 
@@ -111,6 +127,10 @@ class DrawThingsImg2Img:
             "steps": steps,
         }
 
+        encoded_images = []
+        for image_tensor in images:
+            encoded_images.append(image_to_base64(image_tensor))
+
 #        response = requests.post(api_url, json=payload)
 #
 #        # Raise an error if the request failed
@@ -124,19 +144,19 @@ class DrawThingsImg2Img:
 #        print(type(payload))
 
         # Path to your PNG image file
-        image_path = "/Users/jparker/data/sd_outputs/.people/marbro/inputs/1_512sq.JPG"
+        #image_path = "/Users/jparker/data/sd_outputs/.people/marbro/inputs/1_512sq.JPG"
 
         # Read the image and encode it as base64
-        with open(image_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        #with open(image_path, "rb") as image_file:
+        #    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
 
-        payload["init_images"] = [encoded_string]
+        payload["init_images"] = encoded_images
         #print(payload)
 
         response = requests.post(api_url, json=payload)
 
-        #data = response.json()
-        #print(data)
+        data = response.json()
+        print(data)
         # Raise an error if the request failed
         response.raise_for_status()
 
