@@ -21,11 +21,13 @@ class DrawThingsWrapper:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "model": ("STRING", {"default": "flux_1_dev_q8p.ckpt"}),
                 "prompt": ("STRING", {"default": ""}),
                 "seed": ("INT", {"default": 42}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "guidance_scale": ("FLOAT", {"default": 3.5}),
+                "sampler": ("STRING", {"default": "Euler A Trailing"}),
                 "steps": ("INT", {"default": 20}),
             }
         }
@@ -34,16 +36,18 @@ class DrawThingsWrapper:
     RETURN_NAMES = ("generated_image",)
     FUNCTION = "generate_image"
 
-    def generate_image(self, prompt, seed, width, height, guidance_scale, steps):
+    def generate_image(self, model, prompt, seed, width, height, guidance_scale, sampler, steps):
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 
         payload = {
+            "model": model,
             "prompt": prompt,
             "seed": seed,
             "width": width,
             "height": height,
             "guidance_scale": guidance_scale,
+            "sampler": sampler,
             "steps": steps,
         }
 
