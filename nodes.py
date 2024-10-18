@@ -11,7 +11,7 @@ import io
 import torch
 
 
-class DrawThingsWrapper:
+class DrawThingsTxt2Img:
     def __init__(self):
         pass
 
@@ -21,11 +21,13 @@ class DrawThingsWrapper:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "model": ("STRING", {"default": "flux_1_dev_q8p.ckpt"}),
                 "prompt": ("STRING", {"default": ""}),
                 "seed": ("INT", {"default": 42}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "guidance_scale": ("FLOAT", {"default": 3.5}),
+                "sampler": (["UniPC","DPM++ 2M Karras","Euler Ancestral", "DPM++ SDE Karras", "PLMS", "DDIM", "LCM", "Euler A Substep", "DPM++ SDE Substep", "TCD", "DPM++ 2M Trailing", "Euler A Trailing", "DPM++ SDE Trailing", "DDIM Trailing", "DPM++ 2M AYS", "Euler A AYS", "DPM++ SDE AYS"], {"default": "Euler A Trailing"}),
                 "steps": ("INT", {"default": 20}),
             }
         }
@@ -34,16 +36,18 @@ class DrawThingsWrapper:
     RETURN_NAMES = ("generated_image",)
     FUNCTION = "generate_image"
 
-    def generate_image(self, prompt, seed, width, height, guidance_scale, steps):
+    def generate_image(self, model, prompt, seed, width, height, guidance_scale, sampler, steps):
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 
         payload = {
+            "model": model,
             "prompt": prompt,
             "seed": seed,
             "width": width,
             "height": height,
             "guidance_scale": guidance_scale,
+            "sampler": sampler,
             "steps": steps,
         }
 
@@ -68,6 +72,6 @@ class DrawThingsWrapper:
         return (torch.stack(images),)
 
 
-NODE_CLASS_MAPPINGS = {"DrawThingsWrapper": DrawThingsWrapper}
+NODE_CLASS_MAPPINGS = {"DrawThingsTxt2Img": DrawThingsTxt2Img}
 
-NODE_DISPLAY_NAME_MAPPINGS = {"DrawThingsWrapper": "Draw Things Wrapper"}
+NODE_DISPLAY_NAME_MAPPINGS = {"DrawThingsTxt2Img": "Draw Things Txt2Img"}
