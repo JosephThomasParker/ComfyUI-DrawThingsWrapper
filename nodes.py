@@ -11,7 +11,7 @@ import io
 import torch
 
 
-class DrawThingsWrapper:
+class DrawThingsTxt2Img:
     def __init__(self):
         pass
 
@@ -72,6 +72,6 @@ class DrawThingsWrapper:
         return (torch.stack(images),)
 
 
-NODE_CLASS_MAPPINGS = {"DrawThingsWrapper": DrawThingsWrapper}
+NODE_CLASS_MAPPINGS = {"DrawThingsTxt2Img": DrawThingsTxt2Img}
 
-NODE_DISPLAY_NAME_MAPPINGS = {"DrawThingsWrapper": "Draw Things Wrapper"}
+NODE_DISPLAY_NAME_MAPPINGS = {"DrawThingsTxt2Img": "Draw Things Txt2Img"}
