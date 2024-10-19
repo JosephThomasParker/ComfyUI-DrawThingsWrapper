@@ -86,6 +86,38 @@ def image_to_base64(image_tensor):
     encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
     return encoded_string
 
+def resize_for_inpainting(pixels, mask=None):
+    print(type(pixels))
+    x = (pixels.shape[1] // 64) * 64
+    y = (pixels.shape[2] // 64) * 64
+    #mask = torch.nn.functional.interpolate(mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])), size=(pixels.shape[1], pixels.shape[2]), mode="bilinear")
+
+    orig_pixels = pixels
+    pixels = orig_pixels.clone()
+    if pixels.shape[1] != x or pixels.shape[2] != y:
+        x_offset = (pixels.shape[1] % 64) // 2
+        y_offset = (pixels.shape[2] % 64) // 2
+        pixels = pixels[:,x_offset:x + x_offset, y_offset:y + y_offset,:]
+        #pixels = pixels[:,x_offset:x + x_offset, y_offset:y + y_offset]
+        #mask = mask[:,:,x_offset:x + x_offset, y_offset:y + y_offset]
+
+    #m = (1.0 - mask.round()).squeeze(1)
+    #for i in range(3):
+    #    pixels[:,:,:,i] -= 0.5
+    #    pixels[:,:,:,i] *= m
+    #    pixels[:,:,:,i] += 0.5
+    return pixels
+
+def get_image_size(pixels):
+    """
+       Get image size from a size image, i.e. assumed input size is [H, W, C]
+    """
+    print(type(pixels))
+    print(np.shape(pixels))
+    x = (pixels.shape[0] // 64) * 64
+    y = (pixels.shape[1] // 64) * 64
+    return x, y
+
 class DrawThingsImg2Img:
     def __init__(self):
         pass
@@ -102,9 +134,9 @@ class DrawThingsImg2Img:
                 "seed": ("INT", {"default": 42}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
-                "guidance_scale": ("FLOAT", {"default": 3.5}),
+                "guidance_scale": ("FLOAT", {"default": 3.5, "min": 0, "max": 25, "step": 0.1}),
                 "sampler": (["UniPC","DPM++ 2M Karras","Euler Ancestral", "DPM++ SDE Karras", "PLMS", "DDIM", "LCM", "Euler A Substep", "DPM++ SDE Substep", "TCD", "DPM++ 2M Trailing", "Euler A Trailing", "DPM++ SDE Trailing", "DDIM Trailing", "DPM++ 2M AYS", "Euler A AYS", "DPM++ SDE AYS"], {"default": "Euler A Trailing"}),
-                "steps": ("INT", {"default": 20}),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 150, "step": 1}),
             }
         }
 
@@ -116,6 +148,14 @@ class DrawThingsImg2Img:
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/img2img"
 
+        encoded_images = []
+        images_resized = resize_for_inpainting(images)
+        for image_tensor in images_resized:
+            encoded_images.append(image_to_base64(image_tensor))
+
+        height, width = get_image_size(images_resized[0])
+
+
         payload = {
             "model": model,
             "prompt": prompt,
@@ -125,11 +165,9 @@ class DrawThingsImg2Img:
             "guidance_scale": guidance_scale,
             "sampler": sampler,
             "steps": steps,
+            "init_images": encoded_images,
         }
 
-        encoded_images = []
-        for image_tensor in images:
-            encoded_images.append(image_to_base64(image_tensor))
 
 #        response = requests.post(api_url, json=payload)
 #
@@ -150,7 +188,6 @@ class DrawThingsImg2Img:
         #with open(image_path, "rb") as image_file:
         #    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
 
-        payload["init_images"] = encoded_images
         #print(payload)
 
         response = requests.post(api_url, json=payload)
