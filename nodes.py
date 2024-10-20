@@ -305,6 +305,44 @@ class DrawThingsTxt2ImgPipeline:
         return (payload,)
 
 
+class DrawThingsPipelineAddCustom:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "pipeline": ("dict", {"tooltip": "Draw Things pipeline"}),
+                "field": ("STRING",),
+                "value_type": (
+                    ["STRING", "INT", "FLOAT"],
+                    {"tooltip": "Choose the type of the value"},
+                ),
+                "value": ("STRING",),
+            }
+        }
+
+    RETURN_TYPES = ("dict",)
+    RETURN_NAMES = ("pipeline",)
+    FUNCTION = "add_to_pipeline"
+
+    def add_to_pipeline(self, pipeline, field, value, value_type):
+
+        if value_type == "INT":
+            value = int(value)
+        elif value_type == "FLOAT":
+            value = float(value)
+        elif value_type == "STRING":
+            value = str(value)
+
+        pipeline[field] = value
+
+        return (pipeline,)
+
+
 class DrawThingsGenerateFromPipeline:
     def __init__(self):
         pass
@@ -326,14 +364,18 @@ class DrawThingsGenerateFromPipeline:
     def generate_image(self, pipeline):
 
         # Cannot include generation_mode in payload, but need its value
-        gen_mode = pipeline.pop("generation_mode")
+        gen_mode = pipeline["generation_mode"]
         # Call the Draw Things API
         if gen_mode == "txt2img":
             api_url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
         elif gen_mode == "img2img":
             api_url = "http://127.0.0.1:7860/sdapi/v1/img2img"
 
-        response = requests.post(api_url, json=pipeline)
+        payload = {
+            key: value for key, value in pipeline.items() if key != "generation_mode"
+        }
+
+        response = requests.post(api_url, json=payload)
 
         # Raise an error if the request failed
         response.raise_for_status()
@@ -358,6 +400,7 @@ NODE_CLASS_MAPPINGS = {
     "DrawThingsTxt2Img": DrawThingsTxt2Img,
     "DrawThingsImg2Img": DrawThingsImg2Img,
     "DrawThingsTxt2ImgPipeline": DrawThingsTxt2ImgPipeline,
+    "DrawThingsPipelineAddCustom": DrawThingsPipelineAddCustom,
     "DrawThingsGenerateFromPipeline": DrawThingsGenerateFromPipeline,
 }
 
@@ -365,5 +408,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DrawThingsTxt2Img": "Draw Things Txt2Img",
     "DrawThingsImg2Img": "Draw Things Img2Img",
     "DrawThingsTxt2ImgPipeline": "Draw Things Txt2Img Pipeline",
+    "DrawThingsPipelineAddCustom": "Draw Things Pipeline Add Custom Field",
     "DrawThingsGenerateFromPipeline": "Draw Things Generate from Pipeline",
 }
