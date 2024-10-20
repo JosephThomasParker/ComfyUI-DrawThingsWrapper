@@ -343,6 +343,42 @@ class DrawThingsPipelineAddCustom:
         return (pipeline,)
 
 
+class DrawThingsPipelineAddLora:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "pipeline": ("dict", {"tooltip": "Draw Things pipeline"}),
+                "lora": ("STRING",),
+                "weight": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 2.5, "step": 0.1},
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("dict",)
+    RETURN_NAMES = ("pipeline",)
+    FUNCTION = "add_to_pipeline"
+
+    def add_to_pipeline(self, pipeline, lora, weight):
+
+        # Check if 'loras' exists in the pipeline
+        if "loras" not in pipeline:
+            # Create 'loras' as an empty list
+            pipeline["loras"] = []
+
+        # Append the new entry as a dictionary to the list
+        pipeline["loras"].append({"file": lora, "weight": weight})
+
+        return (pipeline,)
+
+
 class DrawThingsGenerateFromPipeline:
     def __init__(self):
         pass
@@ -401,6 +437,7 @@ NODE_CLASS_MAPPINGS = {
     "DrawThingsImg2Img": DrawThingsImg2Img,
     "DrawThingsTxt2ImgPipeline": DrawThingsTxt2ImgPipeline,
     "DrawThingsPipelineAddCustom": DrawThingsPipelineAddCustom,
+    "DrawThingsPipelineAddLora": DrawThingsPipelineAddLora,
     "DrawThingsGenerateFromPipeline": DrawThingsGenerateFromPipeline,
 }
 
@@ -409,5 +446,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DrawThingsImg2Img": "Draw Things Img2Img",
     "DrawThingsTxt2ImgPipeline": "Draw Things Txt2Img Pipeline",
     "DrawThingsPipelineAddCustom": "Draw Things Pipeline Add Custom Field",
+    "DrawThingsPipelineAddLora": "Draw Things Pipeline Add Lora",
     "DrawThingsGenerateFromPipeline": "Draw Things Generate from Pipeline",
 }
