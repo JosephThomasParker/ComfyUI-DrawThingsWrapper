@@ -1,3 +1,7 @@
+0.3
+
+* Added img2img node 
+
 0.2 
 
 * Added textbox to change model (must match downloaded model) and dropdown list to choose sampler
