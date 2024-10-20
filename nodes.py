@@ -240,12 +240,130 @@ class DrawThingsImg2Img:
         return (torch.stack(images),)
 
 
+class DrawThingsTxt2ImgPipeline:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model": ("STRING", {"default": "flux_1_dev_q8p.ckpt"}),
+                "prompt": ("STRING", {"default": ""}),
+                "seed": ("INT", {"default": 42}),
+                "width": ("INT", {"default": 512}),
+                "height": ("INT", {"default": 512}),
+                "guidance_scale": ("FLOAT", {"default": 3.5}),
+                "sampler": (
+                    [
+                        "UniPC",
+                        "DPM++ 2M Karras",
+                        "Euler Ancestral",
+                        "DPM++ SDE Karras",
+                        "PLMS",
+                        "DDIM",
+                        "LCM",
+                        "Euler A Substep",
+                        "DPM++ SDE Substep",
+                        "TCD",
+                        "DPM++ 2M Trailing",
+                        "Euler A Trailing",
+                        "DPM++ SDE Trailing",
+                        "DDIM Trailing",
+                        "DPM++ 2M AYS",
+                        "Euler A AYS",
+                        "DPM++ SDE AYS",
+                    ],
+                    {"default": "Euler A Trailing"},
+                ),
+                "steps": ("INT", {"default": 20}),
+            }
+        }
+
+    RETURN_TYPES = ("dict",)
+    RETURN_NAMES = ("pipeline",)
+    FUNCTION = "generate_pipeline"
+
+    def generate_pipeline(
+        self, model, prompt, seed, width, height, guidance_scale, sampler, steps
+    ):
+
+        payload = {
+            "generation_mode": "txt2img",
+            "model": model,
+            "prompt": prompt,
+            "seed": seed,
+            "width": width,
+            "height": height,
+            "guidance_scale": guidance_scale,
+            "sampler": sampler,
+            "steps": steps,
+        }
+
+        return (payload,)
+
+
+class DrawThingsGenerateFromPipeline:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "pipeline": ("dict", {"tooltip": "Draw Things pipeline"}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("generated_image",)
+    FUNCTION = "generate_image"
+
+    def generate_image(self, pipeline):
+
+        # Cannot include generation_mode in payload, but need its value
+        gen_mode = pipeline.pop("generation_mode")
+        # Call the Draw Things API
+        if gen_mode == "txt2img":
+            api_url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
+        elif gen_mode == "img2img":
+            api_url = "http://127.0.0.1:7860/sdapi/v1/img2img"
+
+        response = requests.post(api_url, json=pipeline)
+
+        # Raise an error if the request failed
+        response.raise_for_status()
+
+        # Parse the JSON response
+        data = response.json()
+
+        # Process the images (assuming they are base64 encoded or raw binary data)
+        images = []
+        for img_data in data["images"]:
+            image_bytes = base64.b64decode(img_data)
+            # Convert the image data to a Pillow Image object
+            image = Image.open(io.BytesIO(image_bytes))
+            image_np = np.array(image)
+            # Convert to float32 tensor and normalize
+            tensor_image = torch.from_numpy(image_np.astype(np.float32) / 255.0)
+            images.append(tensor_image)
+        return (torch.stack(images),)
+
+
 NODE_CLASS_MAPPINGS = {
     "DrawThingsTxt2Img": DrawThingsTxt2Img,
     "DrawThingsImg2Img": DrawThingsImg2Img,
+    "DrawThingsTxt2ImgPipeline": DrawThingsTxt2ImgPipeline,
+    "DrawThingsGenerateFromPipeline": DrawThingsGenerateFromPipeline,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "DrawThingsTxt2Img": "Draw Things Txt2Img",
     "DrawThingsImg2Img": "Draw Things Img2Img",
+    "DrawThingsTxt2ImgPipeline": "Draw Things Txt2Img Pipeline",
+    "DrawThingsGenerateFromPipeline": "Draw Things Generate from Pipeline",
 }
