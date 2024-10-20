@@ -185,6 +185,10 @@ class DrawThingsImg2Img:
                     {"default": "Euler A Trailing"},
                 ),
                 "steps": ("INT", {"default": 20, "min": 1, "max": 150, "step": 1}),
+                "denoise": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
             }
         }
 
@@ -193,7 +197,7 @@ class DrawThingsImg2Img:
     FUNCTION = "generate_image"
 
     def generate_image(
-        self, images, model, prompt, seed, guidance_scale, sampler, steps
+        self, images, model, prompt, seed, guidance_scale, sampler, steps, denoise
     ):
         # Call the Draw Things API
         api_url = "http://127.0.0.1:7860/sdapi/v1/img2img"
@@ -215,6 +219,7 @@ class DrawThingsImg2Img:
             "sampler": sampler,
             "steps": steps,
             "init_images": encoded_images,
+            "strength": denoise,
         }
 
         #        response = requests.post(api_url, json=payload)
