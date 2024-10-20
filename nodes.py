@@ -111,7 +111,6 @@ def image_to_base64(image_tensor):
 
 
 def resize_for_inpainting(pixels, mask=None):
-    print(type(pixels))
     x = (pixels.shape[1] // 64) * 64
     y = (pixels.shape[2] // 64) * 64
     # mask = torch.nn.functional.interpolate(mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])), size=(pixels.shape[1], pixels.shape[2]), mode="bilinear")
@@ -137,8 +136,6 @@ def get_image_size(pixels):
     """
     Get image size from a size image, i.e. assumed input size is [H, W, C]
     """
-    print(type(pixels))
-    print(np.shape(pixels))
     x = (pixels.shape[0] // 64) * 64
     y = (pixels.shape[1] // 64) * 64
     return x, y
@@ -222,37 +219,13 @@ class DrawThingsImg2Img:
             "strength": denoise,
         }
 
-        #        response = requests.post(api_url, json=payload)
-        #
-        #        # Raise an error if the request failed
-        #        response.raise_for_status()
-        #
-        #        # Parse the JSON response
-        #        data = response.json()
-        #        print("Dia duit!")
-        #        #print(data)
-        #        print(type(data))
-        #        print(type(payload))
-
-        # Path to your PNG image file
-        # image_path = "/Users/jparker/data/sd_outputs/.people/marbro/inputs/1_512sq.JPG"
-
-        # Read the image and encode it as base64
-        # with open(image_path, "rb") as image_file:
-        #    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
-
-        # print(payload)
-
         response = requests.post(api_url, json=payload)
 
-        data = response.json()
-        print(data)
         # Raise an error if the request failed
         response.raise_for_status()
 
         # Parse the JSON response
         data = response.json()
-        print(data)
 
         # Process the images (assuming they are base64 encoded or raw binary data)
         images = []
