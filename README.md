@@ -4,7 +4,7 @@ These nodes provide a wrapper for calling [Draw Things](https://drawthings.ai/) 
 
 **Wait, why?** The Draw Things app has been optimized for Apple hardware and runs roughly x3 faster than ComfyUI generations. But ComfyUI is a flexible and powerful tools, and has some features - like queuing and face swapping - that haven't been implemented in Draw Things.
 
-This simple node calls a local instance of Draw Things through its API and returns the resulting image to ComfyUI.
+These simple nodes for txt2img and img2img call a local instance of Draw Things through its API and return the resulting image to ComfyUI.
 
 ![](basic_example.png)
 
