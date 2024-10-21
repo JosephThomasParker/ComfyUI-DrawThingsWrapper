@@ -305,6 +305,86 @@ class DrawThingsTxt2ImgPipeline:
         return (payload,)
 
 
+class DrawThingsImg2ImgPipeline:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE", {"tooltip": "input image"}),
+                "model": ("STRING", {"default": "flux_1_dev_q8p.ckpt"}),
+                "prompt": ("STRING", {"default": ""}),
+                "seed": ("INT", {"default": 42}),
+                "guidance_scale": (
+                    "FLOAT",
+                    {"default": 3.5, "min": 0, "max": 25, "step": 0.1},
+                ),
+                "sampler": (
+                    [
+                        "UniPC",
+                        "DPM++ 2M Karras",
+                        "Euler Ancestral",
+                        "DPM++ SDE Karras",
+                        "PLMS",
+                        "DDIM",
+                        "LCM",
+                        "Euler A Substep",
+                        "DPM++ SDE Substep",
+                        "TCD",
+                        "DPM++ 2M Trailing",
+                        "Euler A Trailing",
+                        "DPM++ SDE Trailing",
+                        "DDIM Trailing",
+                        "DPM++ 2M AYS",
+                        "Euler A AYS",
+                        "DPM++ SDE AYS",
+                    ],
+                    {"default": "Euler A Trailing"},
+                ),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 150, "step": 1}),
+                "denoise": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("dict",)
+    RETURN_NAMES = ("pipeline",)
+    FUNCTION = "generate_pipeline"
+
+    def generate_pipeline(
+        self, images, model, prompt, seed, guidance_scale, sampler, steps, denoise
+    ):
+
+        encoded_images = []
+        images_resized = resize_for_inpainting(images)
+        for image_tensor in images_resized:
+            encoded_images.append(image_to_base64(image_tensor))
+
+        height, width = get_image_size(images_resized[0])
+
+        payload = {
+            "generation_mode": "img2img",
+            "model": model,
+            "prompt": prompt,
+            "seed": seed,
+            "width": width,
+            "height": height,
+            "guidance_scale": guidance_scale,
+            "sampler": sampler,
+            "steps": steps,
+            "init_images": encoded_images,
+            "strength": denoise,
+        }
+
+        return (payload,)
+
+
 class DrawThingsPipelineAddCustom:
     def __init__(self):
         pass
@@ -551,6 +631,7 @@ NODE_CLASS_MAPPINGS = {
     "DrawThingsTxt2Img": DrawThingsTxt2Img,
     "DrawThingsImg2Img": DrawThingsImg2Img,
     "DrawThingsTxt2ImgPipeline": DrawThingsTxt2ImgPipeline,
+    "DrawThingsImg2ImgPipeline": DrawThingsImg2ImgPipeline,
     "DrawThingsPipelineAddCustom": DrawThingsPipelineAddCustom,
     "DrawThingsPipelineAddLora": DrawThingsPipelineAddLora,
     "DrawThingsPipelineAddControl": DrawThingsPipelineAddControl,
@@ -561,6 +642,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DrawThingsTxt2Img": "Draw Things Txt2Img",
     "DrawThingsImg2Img": "Draw Things Img2Img",
     "DrawThingsTxt2ImgPipeline": "Draw Things Txt2Img Pipeline",
+    "DrawThingsImg2ImgPipeline": "Draw Things Img2Img Pipeline",
     "DrawThingsPipelineAddCustom": "Draw Things Pipeline Add Custom Field",
     "DrawThingsPipelineAddLora": "Draw Things Pipeline Add Lora",
     "DrawThingsPipelineAddControl": "Draw Things Pipeline Add Control",
