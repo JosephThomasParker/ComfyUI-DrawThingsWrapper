@@ -1,0 +1,15 @@
+[project]
+name = "comfyui-drawthingswrapper"
+description = "These nodes provide a wrapper for calling Draw Things image generations from ComfyUI. The Draw Things app has been optimized for Apple hardware and runs roughly x3 faster than ComfyUI generations. But ComfyUI is a flexible and powerful tool, and has some features - like queuing and face swapping - that haven't been implemented in Draw Things."
+version = "1.0.0"
+license = {file = "LICENSE"}
+dependencies = ["numpy", "PIL", "requests", "torch"]
+
+[project.urls]
+Repository = "https://github.com/JosephThomasParker/ComfyUI-DrawThingsWrapper"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "seosamh"
+DisplayName = "ComfyUI-DrawThingsWrapper"
+Icon = ""
