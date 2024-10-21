@@ -6,7 +6,7 @@ These nodes provide a wrapper for calling [Draw Things](https://drawthings.ai/) 
 
 This simple nodes for txt2img and img2img call a local instance of Draw Things through its API and return the resulting image to ComfyUI.
 
-![](basic_example.png)
+![](examples/basic_example.png)
 
 # Set up
 
@@ -30,6 +30,8 @@ For basic usage, use the Txt2Img or Img2Img nodes as in the picture above. Other
 ## Advanced usage
 
 For more control over option setting from within ComfyUI, the **pipeline** mode can be used. In this mode, the nodes **Txt2Img Pipeline** or **Img2Img Pipeline** create the settings ("pipeline") for image generation, but unlike their basic counterparts, do not call the image generation. The image generation is done by the **Generate from Pipeline** mode, which takes a pipeline and calls the Draw Things API. Between these steps, the pipeline can be modified to set advanced options, and add lora and controlnets.
+
+![](examples/advanced_example.png)
 
 # Limitations
 
