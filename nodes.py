@@ -379,6 +379,117 @@ class DrawThingsPipelineAddLora:
         return (pipeline,)
 
 
+class DrawThingsPipelineAddControl:
+    def __init__(self):
+        pass
+
+    CATEGORY = "DrawThingsWrapper"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "pipeline": ("dict", {"tooltip": "Draw Things pipeline"}),
+                "control": ("STRING",),
+                "weight": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 2.5, "step": 0.1},
+                ),
+                "guidanceStart": (
+                    "FLOAT",
+                    {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+                "guidanceEnd": (
+                    "FLOAT",
+                    {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01},
+                ),
+                "noPrompt": (
+                    "BOOLEAN",
+                    {"default": False},
+                ),
+                "globalAveragePooling": (
+                    "BOOLEAN",
+                    {"default": False},
+                ),
+                "downSamplingRate": (
+                    "FLOAT",
+                    {"default": 0.0},
+                ),
+                "controlImportance": (
+                    "STRING",
+                    {"default": 1.0},
+                ),
+                "controlImportance": (
+                    [
+                        "balanced",
+                        "prompt",
+                        "control",
+                    ],
+                    {"default": "balanced"},
+                ),
+                "inputOverride": ("STRING",),
+                "targetBlocks": ("STRING",),
+            }
+        }
+
+    RETURN_TYPES = ("dict",)
+    RETURN_NAMES = ("pipeline",)
+    FUNCTION = "add_to_pipeline"
+
+    def add_to_pipeline(
+        self,
+        pipeline,
+        control,
+        weight,
+        guidanceStart,
+        guidanceEnd,
+        noPrompt,
+        globalAveragePooling,
+        downSamplingRate,
+        controlImportance,
+        inputOverride,
+        targetBlocks,
+    ):
+
+        # file_path = ""
+        # with open(file_path, "rb") as png_file:
+        #    # Read the file contents
+        #    png_data = png_file.read()
+        #
+        #    # Encode the binary data to base64
+        #    encoded_data = base64.b64encode(png_data)
+        #
+        #    # Convert bytes to string for easier handling
+        #    base64_string = encoded_data.decode('utf-8')
+
+        # Check if 'controls' exists in the pipeline
+        if "controls" not in pipeline:
+            # Create 'controls' as an empty list
+            pipeline["controls"] = []
+
+        # Append the new entry as a dictionary to the list
+        pipeline["controls"].append(
+            {
+                "file": control,
+                "weight": weight,
+                "guidanceStart": guidanceStart,
+                "guidanceEnd": guidanceEnd,
+                "noPrompt": noPrompt,
+                "globalAveragePooling": globalAveragePooling,
+                "downSamplingRate": downSamplingRate,
+                "controlImportance": controlImportance,
+                "inputOverride": inputOverride,  # in eg union controlnets, select type
+                "targetBlocks": [],
+                "enabled": True,
+                # "image": {
+                #  "image": base64_string
+                # }
+            }
+        )
+
+        return (pipeline,)
+
+
 class DrawThingsGenerateFromPipeline:
     def __init__(self):
         pass
@@ -411,7 +522,11 @@ class DrawThingsGenerateFromPipeline:
             key: value for key, value in pipeline.items() if key != "generation_mode"
         }
 
+        print(payload)
         response = requests.post(api_url, json=payload)
+
+        data = response.json()
+        # print(data)
 
         # Raise an error if the request failed
         response.raise_for_status()
@@ -438,6 +553,7 @@ NODE_CLASS_MAPPINGS = {
     "DrawThingsTxt2ImgPipeline": DrawThingsTxt2ImgPipeline,
     "DrawThingsPipelineAddCustom": DrawThingsPipelineAddCustom,
     "DrawThingsPipelineAddLora": DrawThingsPipelineAddLora,
+    "DrawThingsPipelineAddControl": DrawThingsPipelineAddControl,
     "DrawThingsGenerateFromPipeline": DrawThingsGenerateFromPipeline,
 }
 
@@ -447,5 +563,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DrawThingsTxt2ImgPipeline": "Draw Things Txt2Img Pipeline",
     "DrawThingsPipelineAddCustom": "Draw Things Pipeline Add Custom Field",
     "DrawThingsPipelineAddLora": "Draw Things Pipeline Add Lora",
+    "DrawThingsPipelineAddControl": "Draw Things Pipeline Add Control",
     "DrawThingsGenerateFromPipeline": "Draw Things Generate from Pipeline",
 }
