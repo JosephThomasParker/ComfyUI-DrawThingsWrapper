@@ -602,10 +602,10 @@ class DrawThingsGenerateFromPipeline:
             key: value for key, value in pipeline.items() if key != "generation_mode"
         }
 
-        print(payload)
+        #print(payload)
         response = requests.post(api_url, json=payload)
 
-        data = response.json()
+        #data = response.json()
         # print(data)
 
         # Raise an error if the request failed
