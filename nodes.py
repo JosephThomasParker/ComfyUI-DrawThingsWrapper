@@ -32,7 +32,7 @@ class DrawThingsTxt2Img:
                     [
                         "UniPC",
                         "DPM++ 2M Karras",
-                        "Euler Ancestral",
+                        "Euler a",
                         "DPM++ SDE Karras",
                         "PLMS",
                         "DDIM",
@@ -163,7 +163,7 @@ class DrawThingsImg2Img:
                     [
                         "UniPC",
                         "DPM++ 2M Karras",
-                        "Euler Ancestral",
+                        "Euler a",
                         "DPM++ SDE Karras",
                         "PLMS",
                         "DDIM",
@@ -260,7 +260,7 @@ class DrawThingsTxt2ImgPipeline:
                     [
                         "UniPC",
                         "DPM++ 2M Karras",
-                        "Euler Ancestral",
+                        "Euler a",
                         "DPM++ SDE Karras",
                         "PLMS",
                         "DDIM",
@@ -327,7 +327,7 @@ class DrawThingsImg2ImgPipeline:
                     [
                         "UniPC",
                         "DPM++ 2M Karras",
-                        "Euler Ancestral",
+                        "Euler a",
                         "DPM++ SDE Karras",
                         "PLMS",
                         "DDIM",
